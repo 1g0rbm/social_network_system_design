@@ -1,2 +1,2 @@
-# social_network_system_design
-System Design социальной сети для курса по System Design
+# Social Network System_Design
+System Design социальной сети для курса по System Design.
