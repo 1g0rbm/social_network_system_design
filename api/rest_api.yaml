@@ -1,0 +1,2300 @@
+openapi: 3.1.0
+info:
+  title: System Design Course
+  version: 0.0.0
+tags:
+  - name: Auth
+  - name: Users
+  - name: Posts
+  - name: Comments
+  - name: Reactions
+  - name: Feed
+  - name: Locations
+  - name: Media
+paths:
+  /api/v1/auth/login:
+    post:
+      operationId: AuthApi_login
+      summary: Вход по логину и паролю
+      description: Аутентифицирует пользователя по логину и паролю и возвращает токены.
+      parameters: []
+      responses:
+        '200':
+          description: Модель 200 OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+  /api/v1/auth/logout:
+    post:
+      operationId: AuthApi_logout
+      summary: Выход из системы
+      description: Завершает текущую пользовательскую сессию.
+      parameters: []
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Auth
+  /api/v1/auth/oauth/login:
+    post:
+      operationId: AuthApi_oauth_login
+      summary: OAuth-вход
+      description: Аутентифицирует пользователя через внешнего OAuth-провайдера.
+      parameters: []
+      responses:
+        '200':
+          description: Модель 200 OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthLoginRequest'
+  /api/v1/auth/password/reset/confirm:
+    post:
+      operationId: AuthApi_confirm_password_reset
+      summary: Подтверждение сброса пароля
+      description: Подтверждает сброс пароля по токену и устанавливает новый пароль.
+      parameters: []
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmPasswordResetRequest'
+  /api/v1/auth/password/reset/request:
+    post:
+      operationId: AuthApi_request_password_reset
+      summary: Запрос на сброс пароля
+      description: Инициирует процесс сброса пароля для указанного email.
+      parameters: []
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPasswordResetRequest'
+  /api/v1/auth/register:
+    post:
+      operationId: AuthApi_register
+      summary: Регистрация пользователя
+      description: Создает учетную запись пользователя и возвращает пару токенов.
+      parameters: []
+      responses:
+        '201':
+          description: Модель 201 Created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+  /api/v1/comments/{comment_id}/reactions:
+    put:
+      operationId: CommentsReactionsApi_set_reaction
+      summary: Реакция на комментарий
+      description: Устанавливает или обновляет реакцию текущего пользователя на комментарий.
+      parameters:
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Reactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetReactionRequest'
+    delete:
+      operationId: CommentsReactionsApi_delete_reaction
+      summary: Удаление реакции с комментария
+      description: Удаляет реакцию текущего пользователя с комментария.
+      parameters:
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Reactions
+  /api/v1/feed:
+    get:
+      operationId: FeedApi_get_feed
+      summary: Лента постов
+      description: Возвращает ленту постов текущего пользователя с пагинацией.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                  - limit
+                  - offset
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PostPreview'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                description: Модель списка.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Feed
+  /api/v1/locations:
+    get:
+      operationId: LocationsApi_search_locations
+      summary: Список локаций
+      description: Возвращает список локаций с фильтрацией по поисковому запросу и периоду.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+        - name: period
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/TopPeriod'
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                  - limit
+                  - offset
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Location'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                description: Модель списка.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Locations
+  /api/v1/locations/{location_id}/posts:
+    get:
+      operationId: LocationsApi_get_posts_by_location
+      summary: Посты по локации
+      description: Возвращает список постов, привязанных к указанной локации.
+      parameters:
+        - name: location_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+        - name: sort
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Sort'
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                  - limit
+                  - offset
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PostPreview'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                description: Модель списка.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Locations
+  /api/v1/media/uploads:
+    post:
+      operationId: MediaApi_init_upload
+      summary: Инициализация загрузки медиа
+      description: Инициализирует прямую загрузку файла и возвращает параметры для отправки в объектное хранилище.
+      parameters: []
+      responses:
+        '201':
+          description: Модель 201 Created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitUploadResponse'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Media
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitUploadRequest'
+  /api/v1/media/uploads/{upload_id}:
+    get:
+      operationId: MediaApi_get_upload_status
+      summary: Статус загрузки медиа
+      description: Возвращает текущий статус загрузки по идентификатору upload-сессии.
+      parameters:
+        - name: upload_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '200':
+          description: Модель 200 OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadStatus'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Media
+  /api/v1/media/uploads/{upload_id}/complete:
+    post:
+      operationId: MediaApi_complete_upload
+      summary: Завершение загрузки медиа
+      description: Подтверждает завершение загрузки файла и возвращает созданный медиа-объект.
+      parameters:
+        - name: upload_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '200':
+          description: Модель 200 OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Media
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteUploadRequest'
+  /api/v1/media/{media_id}:
+    get:
+      operationId: MediaApi_get_media
+      summary: Получение медиа
+      description: Возвращает метаданные медиа-объекта по идентификатору.
+      parameters:
+        - name: media_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '200':
+          description: Модель 200 OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Media
+    delete:
+      operationId: MediaApi_delete_media
+      summary: Удаление медиа
+      description: Удаляет медиа-объект по идентификатору.
+      parameters:
+        - name: media_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Media
+  /api/v1/posts:
+    post:
+      operationId: PostsApi_create_post
+      summary: Создание поста
+      description: Создает новый пост с текстом, локацией и медиа-вложениями.
+      parameters: []
+      responses:
+        '201':
+          description: Модель 201 Created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostFull'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Posts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+    get:
+      operationId: PostsApi_get_list_posts
+      summary: Список постов
+      description: Возвращает список постов с пагинацией и опциональной фильтрацией по автору.
+      parameters:
+        - name: author_id
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/uuid'
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                  - limit
+                  - offset
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PostPreview'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                description: Модель списка.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Posts
+  /api/v1/posts/{post_id}:
+    get:
+      operationId: PostsApi_get_post
+      summary: Получение поста
+      description: Возвращает полный пост по его идентификатору.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '200':
+          description: Модель 200 OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostFull'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Posts
+    patch:
+      operationId: PostsApi_update_post
+      summary: Обновление поста
+      description: Обновляет поля существующего поста по его идентификатору.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '200':
+          description: Модель 200 OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostFull'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Posts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePostRequest'
+    delete:
+      operationId: PostsApi_delete_post
+      summary: Удаление поста
+      description: Удаляет пост по его идентификатору.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Posts
+  /api/v1/posts/{post_id}/comments:
+    post:
+      operationId: CommentsApi_create_comment
+      summary: Создание комментария
+      description: Создает комментарий для указанного поста.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '201':
+          description: Модель 201 Created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Comments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequest'
+    get:
+      operationId: CommentsApi_get_post_comments
+      summary: Список комментариев
+      description: Возвращает список комментариев к посту с пагинацией.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                  - limit
+                  - offset
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                description: Модель списка.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Comments
+  /api/v1/posts/{post_id}/comments/{comment_id}:
+    delete:
+      operationId: CommentsApi_delete_comment
+      summary: Удаление комментария
+      description: Удаляет комментарий у указанного поста.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Comments
+  /api/v1/posts/{post_id}/reactions:
+    put:
+      operationId: PostsReactionsApi_set_reaction
+      summary: Реакция на пост
+      description: Устанавливает или обновляет реакцию текущего пользователя на пост.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Reactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetReactionRequest'
+    delete:
+      operationId: PostsReactionsApi_delete_reaction
+      summary: Удаление реакции с поста
+      description: Удаляет реакцию текущего пользователя с поста.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Reactions
+  /api/v1/users/me:
+    patch:
+      operationId: UsersApi_update_me
+      summary: Обновление профиля
+      description: Обновляет данные профиля текущего пользователя.
+      parameters: []
+      responses:
+        '200':
+          description: Модель 200 OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+  /api/v1/users/{user_id}:
+    get:
+      operationId: UsersApi_get_user
+      summary: Профиль пользователя
+      description: Возвращает профиль пользователя по его идентификатору.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '200':
+          description: Модель 200 OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Users
+  /api/v1/users/{user_id}/follow:
+    post:
+      operationId: UsersApi_follow
+      summary: Подписка на пользователя
+      description: Создает подписку текущего пользователя на указанного пользователя.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Users
+    delete:
+      operationId: UsersApi_unfollow
+      summary: Отписка от пользователя
+      description: Удаляет подписку текущего пользователя на указанного пользователя.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+      responses:
+        '204':
+          description: Модель 204 No Content.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Users
+    get:
+      operationId: UsersApi_get_follow
+      summary: Список подписок и подписчиков
+      description: Возвращает список подписчиков или подписок пользователя в зависимости от параметра type.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/uuid'
+        - name: type
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/FollowType'
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                  - limit
+                  - offset
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                description: Модель списка.
+        '400':
+          description: Модель ошибки 400 Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Модель ошибки 401 Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Модель ошибки 404 Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Модель ошибки 422 Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+        '500':
+          description: Модель ошибки 500 Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      tags:
+        - Users
+components:
+  schemas:
+    BadRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Error'
+      description: Модель ошибки 400 Bad Request.
+    Comment:
+      type: object
+      required:
+        - id
+        - post_id
+        - author_id
+        - text
+        - like_count
+        - created_at
+        - updated_at
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid'
+        post_id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: ID поста.
+        author_id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: ID автора комментария.
+        text:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Текст комментария.
+        like_count:
+          type: integer
+          format: int64
+          description: Количество лайков комментария.
+        created_at:
+          type: string
+          format: date-time
+          description: Время создания комментария.
+        updated_at:
+          type: string
+          format: date-time
+          description: Время обновления комментария.
+      description: Модель комментария.
+    CompleteUploadRequest:
+      type: object
+      properties:
+        etag:
+          type: string
+          description: ETag файла (опционально).
+      description: Запрос на завершение прямой загрузки файла в объектное хранилище.
+    ConfirmPasswordResetRequest:
+      type: object
+      required:
+        - token
+        - new_password
+      properties:
+        token:
+          type: string
+          description: Токен сброса пароля.
+        new_password:
+          type: string
+          minLength: 8
+          description: Новый пароль в открытом виде.
+      description: Запрос на подтверждение сброса пароля.
+    Conflict:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Error'
+      description: Модель ошибки 409 Conflict.
+    CreateCommentRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Текст комментария.
+      description: Запрос на создание комментария.
+    CreatePostRequest:
+      type: object
+      required:
+        - title
+        - text
+        - location_id
+        - media_ids
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Название поста.
+        text:
+          type: string
+          minLength: 1
+          maxLength: 5000
+          description: Текст поста.
+        location_id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: ID локации поста.
+        media_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/uuid'
+          maxItems: 5
+          description: ID медиа файлов поста.
+      description: Модель запроса на создание поста.
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Код ошибки.
+        message:
+          type: string
+          description: Сообщение об ошибке.
+      description: Модель ошибки.
+    FollowType:
+      type: string
+      enum:
+        - followers
+        - following
+    Forbidden:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Error'
+      description: Модель ошибки 403 Forbidden.
+    InitUploadRequest:
+      type: object
+      required:
+        - file_name
+        - content_type
+        - size_bytes
+      properties:
+        file_name:
+          type: string
+          description: Оригинальное имя файла, отображаемое пользователю.
+        content_type:
+          type: string
+          description: Тип содержимого файла (например, 'image/jpeg', 'video/mp4').
+        size_bytes:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Размер файла в байтах.
+      description: Запрос на инициализацию прямой загрузки файла в объектное хранилище.
+    InitUploadResponse:
+      type: object
+      required:
+        - upload_id
+        - media_id
+        - upload_url
+        - method
+        - expires_at
+      properties:
+        upload_id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: Уникальный идентификатор запроса загрузки.
+        media_id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: Уникальный идентификатор медиа-объекта.
+        upload_url:
+          type: string
+          format: uri
+          description: URL для прямой загрузки файла.
+        method:
+          type: string
+          enum:
+            - PUT
+            - POST
+          description: Метод загрузки (PUT или POST).
+        expires_at:
+          type: string
+          format: date-time
+          description: Время истечения срока действия URL для загрузки.
+      description: Ответ на инициализацию прямой загрузки файла в объектное хранилище.
+    InternalServerError:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Error'
+      description: Модель ошибки 500 Internal Server Error.
+    Location:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - lat
+        - lon
+        - media
+        - created_at
+        - updated_at
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Название локации.
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Описание локации.
+        lat:
+          type: number
+          format: double
+          description: Широта локации.
+        lon:
+          type: number
+          format: double
+          description: Долгота локации.
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+          description: Медиа файлы локации.
+        created_at:
+          type: string
+          format: date-time
+          description: Время создания локации.
+        updated_at:
+          type: string
+          format: date-time
+          description: Время обновления локации.
+      description: Модель локации.
+    LoginRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          description: Логин пользователя (email или username).
+        password:
+          type: string
+          minLength: 8
+          description: Пароль в открытом виде.
+      description: Запрос на вход в систему.
+    Media:
+      type: object
+      required:
+        - id
+        - url
+        - mime_type
+        - width
+        - height
+        - created_at
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid'
+        url:
+          type: string
+          format: uri
+          description: URL медиа файла.
+        mime_type:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: MIME тип медиа файла.
+        width:
+          type: integer
+          description: Ширина медиа файла.
+        height:
+          type: integer
+          description: Высота медиа файла.
+        created_at:
+          type: string
+          format: date-time
+          description: Время создания медиа файла.
+      description: Модель медиа файла.
+    NotFound:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Error'
+      description: Модель ошибки 404 Not Found.
+    OAuthLoginRequest:
+      type: object
+      required:
+        - provider
+        - code
+        - redirect_uri
+      properties:
+        provider:
+          type: string
+          enum:
+            - google
+            - vk
+            - yandex
+          description: Провайдер OAuth (google, vk, yandex).
+        code:
+          type: string
+          description: Код авторизации от провайдера OAuth.
+        redirect_uri:
+          type: string
+          format: uri
+          description: URL перенаправления после авторизации.
+      description: Запрос на вход в систему через OAuth.
+    PostFull:
+      type: object
+      required:
+        - text
+        - media
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 5000
+          description: Текст поста.
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+          description: Медиа файлы поста.
+      allOf:
+        - $ref: '#/components/schemas/PostPreview'
+      description: Модель полного поста.
+    PostPreview:
+      type: object
+      required:
+        - id
+        - author_id
+        - title
+        - location_id
+        - like_count
+        - comment_count
+        - created_at
+        - updated_at
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid'
+        author_id:
+          $ref: '#/components/schemas/uuid'
+        title:
+          type: string
+          description: ID автора поста.
+        location_id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: ID локации поста.
+        like_count:
+          type: integer
+          format: int64
+          description: Количество лайков поста.
+        comment_count:
+          type: integer
+          format: int64
+          description: Количество комментариев поста.
+        created_at:
+          type: string
+          format: date-time
+          description: Время создания поста.
+        updated_at:
+          type: string
+          format: date-time
+          description: Время обновления поста.
+      description: Модель превью поста.
+    ReactionType:
+      type: string
+      enum:
+        - like
+        - dislike
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 32
+          description: Имя пользователя.
+        email:
+          type: string
+          format: email
+          description: Email пользователя.
+        password:
+          type: string
+          minLength: 8
+          description: Пароль в открытом виде.
+        avatar_url:
+          type: string
+          format: uri
+          description: URL аватара пользователя (опционально).
+      description: Запрос на регистрацию нового пользователя.
+    RequestPasswordResetRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email пользователя.
+      description: Запрос на сброс пароля.
+    SetReactionRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          allOf:
+            - $ref: '#/components/schemas/ReactionType'
+          description: Тип реакции.
+      description: Модель запроса на установку реакции.
+    Sort:
+      type: string
+      enum:
+        - created_at
+        - popularity
+      description: Сортировка постов по времени создания или популярности.
+    TokenPair:
+      type: object
+      required:
+        - access_token
+        - refresh_token
+        - expires_in_sec
+      properties:
+        access_token:
+          type: string
+          description: Токен доступа.
+        refresh_token:
+          type: string
+          description: Токен обновления.
+        expires_in_sec:
+          type: integer
+          format: int32
+          minimum: 60
+          description: Время истечения срока действия токенов в секундах.
+      description: Пара токенов доступа и обновления.
+    TopPeriod:
+      type: string
+      enum:
+        - day
+        - month
+        - year
+      description: Период топа локаций.
+    Unauthorized:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Error'
+      description: Модель ошибки 401 Unauthorized.
+    UnprocessableEntity:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Error'
+      description: Модель ошибки 422 Unprocessable Entity.
+    UpdatePostRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Название поста.
+        text:
+          type: string
+          minLength: 1
+          maxLength: 5000
+          description: Текст поста.
+        location_id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: ID локации поста.
+        media_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/uuid'
+          maxItems: 5
+          description: ID медиа файлов поста.
+      description: Модель запроса на обновление поста.
+    UpdateProfileRequest:
+      type: object
+      properties:
+        avatar_url:
+          type: string
+          format: uri
+          description: URL аватара пользователя.
+        bio:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Биография пользователя.
+      description: Модель запроса на обновление профиля.
+    UploadStatus:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - pending
+            - ready
+            - failed
+          description: Статус загрузки (pending - ожидание, ready - завершено, failed - ошибка).
+      description: Статус загрузки файла в объектное хранилище.
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - created_at
+        - updated_at
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid'
+        username:
+          type: string
+          minLength: 3
+          maxLength: 32
+          description: Имя пользователя.
+        email:
+          type: string
+          format: email
+          description: Email пользователя.
+        avatar_url:
+          type: string
+          format: uri
+          description: URL аватара пользователя (опционально).
+        bio:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Биография пользователя (опционально).
+        created_at:
+          type: string
+          format: date-time
+          description: Время создания пользователя.
+        updated_at:
+          type: string
+          format: date-time
+          description: Время обновления пользователя.
+      description: Модель пользователя.
+    uuid:
+      type: string
+      format: uuid
+      description: UUID.
