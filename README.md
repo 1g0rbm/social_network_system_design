@@ -244,3 +244,58 @@ System Design социальной сети для курса по System Design
 - `RPS write`: `15_000_000 * 10 / 86400 = 1736.1 ~= 1736`
 
 - `Traffic write`: `1736 * 36 = 62_496 B/s`
+
+## Оценка требуемой памяти
+
+**Формулы:**
+- `Disks_for_capacity = capacity / disk_capacity`
+- `Disks_for_throughput = traffic_per_second / disk_throughput`
+- `Disks_for_iops = iops / disk_iops`
+- `Disks = max(ceil(Disks_for_capacity), ceil(Disks_for_throughput), ceil(Disks_for_iops))`
+
+
+**Где:**
+- **disk_capacity** - объем одного диска 
+- **capacity** - суммарный объем данных, которое необходимо хранить 
+- **traffic_per_second** - суммарный трафик на запись/чтение в секунду 
+- **disk_throughput** - пропускная способность одного диска 
+- **iops** - суммарное количество запросов в секунду 
+- **disk_iops** - количество операций ввода-вывод диска в секунду 
+- **ceil** - функция округления вверх до целого числа
+
+### Посты, поиск и лента (SSD nvme)
+- `Capacity: (78_450 + 62_496) B/s * 86_400 * 365 = 4_444_873_056_000B / (1024^4) ≈ 4.043 TiB`
+- `Traffic_per_second: 78_450 + 25_312_338 + 2_723_784 + 505_926 = 28_620_498 / (1024 * 1024) ≈ 27.29 MiB/s`
+- `IOPS: 25 + 868 + 1736 + 17_361 + 347 = 20_637`
+- 
+- `Disks_for_capacity =4.043 TiB / 10 TiB ≈ 0.4`
+- `Disks_for_throughput = 27.29 MiB/s / (3 * 1024) MiB/s = 0.008`
+- `Disks_for_iops = 19_990 / 10000 = 1.9`
+- 
+- `Disks = max(ceil(0.4), ceil(0.008), ceil(1.9)) = 2`
+
+### Медиа в постах, ленте, поиске (SSD SATA)
+- `Capacity: 625_000_000 B/s * 86_400 * 365 ≈ 17 928.22 TiB`
+- `Traffic_per_second = 625_000_000 + 21_700_000_000 + 173_500_000 + 43_402_500_000 = 65_901_000_000 B/s ≈ 62_848.09 MiB/s`
+- `IOPS: 125 + 4340 + 347 + 86_805 = 91_617`
+- 
+- `Disks_for_capacity = 17 928.22 TiB / 100 TiB ≈ 179.3`
+- `Disks_for_throughput = 62_848.09 MiB/s / 500 MiB/s ≈ 125.7`
+- `Disks_for_iops = 91_617 / 1000 = 91.6`
+- 
+- `Disks = max(ceil(179.3), ceil(125.7), ceil(91.6)) = 180`
+
+### Комментарии (SSD nvme)
+- `Capacity: 721_760 B/s * 86_400 * 365 ≈ 20.7 TiB`
+- `Traffic_per_second = 721_760 + 3_610_880 ≈ 4.13 MiB/s`
+- `IOPS: 347 + 1736 + = 2083`
+- 
+- `Disks_for_capacity = 20.7 TiB / 25 TiB ≈ 0.8`
+- `Disks_for_throughput = 4.13 MiB/s / 10000 MiB/s ≈ 0.0004`
+- `Disks_for_iops = 2083 / (3 * 1024)  = 0.67`
+- 
+- `Disks = max(ceil(0.8), ceil(0.04), ceil(0.67)) = 1`
+
+
+## Модель хранения данных
+![Схема БД](database/db.svg)
