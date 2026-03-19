@@ -34,8 +34,6 @@ Table medias {
   storage_key varchar [not null, note: 'S3 object key']
   bucket varchar [not null, note: 'S3 bucket name']
   mime_type varchar [not null]
-  width int
-  height int
   created_at timestamp [not null]
 
   Note: 'Медиа-файлы хранятся в S3. БД хранит только метаданные.'
@@ -66,6 +64,25 @@ Table comments {
     post_id
     created_at
   }
+}
+
+Table feed_post_cards {
+  post_id uuid [pk, ref: > posts.id ]
+  title varchar
+  text text [not null]
+  author_id uuid [not null, ref: > users.id]
+  username varchar [not null]
+  avatar_url string
+  media jsonb // [{media_id, s3_key, mime}, ...]
+  comments_count int64 [not null, default: 0]
+  location_id uuid [not null, ref: > locations.id]
+  likes_count int64 [not null, default: 0]
+  view_count int64 [not null, default: 0]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  deleted_at timestamp
+
+  Note: 'Read model: карточка поста для ленты/поиска; обновляется асинхронно через очередь (eventual consistency)'
 }
 
 Enum reaction_type {
@@ -101,8 +118,9 @@ Table locations {
   id uuid [pk]
   title varchar [not null]
   description text [not null]
-  lat float64
-  lon float64
+  point geography(Point)
+
+  Note: 'Пост привязывается к существующей локации, если его точка попадает в радиус X метров.'
 }
 
 Table locations2medias {
