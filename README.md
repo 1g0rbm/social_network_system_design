@@ -109,12 +109,12 @@ System Design социальной сети для курса по System Design
 
 ## Доменная модель
 
-- `User` (650 B):
+- `User` (546 B):
   - id uuid (16 B)
   - username string (~10 символов ASCII = 10 B)
   - email string (~20 символов ASCII = 20 B)
   - password_hash string (~60 символов ASCII = 60 B)
-  - avatar_url string (~120 символов ASCII = 120 B)
+  - avatar_media_id uuid (16 B)
   - bio string (~200 символов кириллицы = 400 B)
   - created_at timestamp (8 B)
   - updated_at timestamp (8 B)
@@ -132,17 +132,17 @@ System Design социальной сети для курса по System Design
   - updated_at timestamp (8 B)
   - deleted_at timestamp (8 B)
 
-- `Media` (170 B):
+- `Media` (184 B):
   - id uuid (16 B)
-  - url string (~120 символов ASCII = 120 B)
+  - bucket string (~ 30 B)
+  - storage_key string (~120 символов ASCII = 120 B)
   - mime_type string (~10 символов ASCII = 10 B)
-  - width int64 (8 B)
-  - height int64 (8 B)
   - created_at timestamp (8 B)
 
-- `PostMedia` (32 B):
+- `PostMedia` (40 B):
   - post_id uuid (16 B)
   - media_id uuid (16 B)
+  - created_at timestamo (16 B)
 
 - `Comment` (2080 B):
   - id uuid (16 B)
@@ -154,15 +154,17 @@ System Design социальной сети для курса по System Design
   - updated_at timestamp (8 B)
   - deleted_at timestamp (8 B)
 
-- `PostReaction` (36 B):
+- `PostReaction` (44 B):
   - user_id uuid (16 B)
   - post_id uuid (16 B)
   - type enum(`like`, `dislike`) (4 B)
+  - created_at timestamp (8 B) 
 
-- `CommentReaction` (36 B):
+- `CommentReaction` (44 B):
   - user_id uuid (16 B)
   - comment_id uuid (16 B)
   - type enum(`like`, `dislike`) (4 B)
+  - created_at timestamp (8 B) 
 
 - `Location` (2232 B):
   - id uuid (16 B)
@@ -171,23 +173,40 @@ System Design социальной сети для курса по System Design
   - lat float64 (8 B)
   - lon float64 (8 B)
 
-- `LocationMedia` (32 B):
+- `LocationMedia` (40 B):
   - location_id uuid (16 B)
   - media_id uuid (16 B)
+  - created_at timestamp (8 B) 
 
 - `Follow` (40 B):
   - follower_id uuid (16 B)
   - followee_id uuid (16 B)
   - created_at timestamp (8 B)
 
+- `FeedPostCard` (2426 B)
+  - post_id uuid (16 B)
+  - title string (~100 символов кириллицы = 200 B)
+  - text string (~1000 символов кириллицы = 2000 B)
+  - author_id uuid (16 B)
+  - username string (~10 символов ASCII = 10 B)
+  - avatar_url string (~120 символов ASCII = 120 B)
+  - media jsonb // [{media_id, s3_key, mime}, ...] (~ 1000 B)
+  - comments_count int64 (8 B)
+  - location_id uuid (16 B)
+  - likes_count int64(8 B)
+  - view_count int64 (8 B)
+  - created_at timestamp (8 B)
+  - updated_at timestamp (8 B)
+  - deleted_at timestamp (8 B)
+
 ## Оценка объёма данных
 
-- Метаданные полного поста (post + 5 media metadata): `2288 + 5 * 170 = 3138 B`
-- Метаданные карточки поста в ленте/поиске: `1458 B`
+- Метаданные полного поста (post + 5 media metadata): `2288 + 5 * 184 = 3208 B`
+- Метаданные карточки поста в ленте/поиске: `2426 B`
 - Медиа поста (5 фотографий по 5 MB): `25_000_000 B`
 - Сжатое медиа для ленты/поиска (5 фотографий по 500 KB): `2_500_000 B`
 - Комментарий: `2080 B`
-- Реакция под постом или комментарием: `36 B`
+- Реакция под постом или комментарием: `44 B`
 
 ## Оценка нагрузки
 
@@ -196,8 +215,8 @@ System Design социальной сети для курса по System Design
 - `RPS write`: `15_000_000 / 86400 / 7 = 24.8 ~= 25`
 - `RPS read`: `15_000_000 * 5 / 86400 = 868.1 ~= 868`
 
-- `Traffic write`: `25 * 3138 = 78_450 B/s`
-- `Traffic read`: `868 * 3138 = 2_723_784 B/s`
+- `Traffic write`: `25 * 3208 = 80_200 B/s`
+- `Traffic read`: `868 * 3208 = 2_784_544 B/s`
 
 ### Медиа в посте
 
@@ -211,7 +230,7 @@ System Design социальной сети для курса по System Design
 
 - `RPS read`: `15_000_000 * 5 * 20 / 86400 = 17_361.1 ~= 17_361`
 
-- `Traffic read`: `17_361 * 1458 = 25_312_338 B/s`
+- `Traffic read`: `17_361 * 2426 = 42_117_786 B/s`
 
 ### Медиа в ленте
 
@@ -223,7 +242,7 @@ System Design социальной сети для курса по System Design
 
 - `RPS read`: `15_000_000 * 2 / 86400 = 347.2 ~= 347`
 
-- `Traffic read`: `347 * 1458 = 505_926 B/s`
+- `Traffic read`: `347 * 2426 = 841_822 B/s`
 
 ### Медиа в поиске
 
@@ -243,7 +262,7 @@ System Design социальной сети для курса по System Design
 
 - `RPS write`: `15_000_000 * 10 / 86400 = 1736.1 ~= 1736`
 
-- `Traffic write`: `1736 * 36 = 62_496 B/s`
+- `Traffic write`: `1736 * 44 = 76_384 B/s`
 
 ## Оценка требуемой памяти
 
@@ -264,37 +283,48 @@ System Design социальной сети для курса по System Design
 - **ceil** - функция округления вверх до целого числа
 
 ### Посты, поиск и лента (SSD nvme)
-- `Capacity: (78_450 + 62_496) B/s * 86_400 * 365 = 4_444_873_056_000B / (1024^4) ≈ 4.043 TiB`
-- `Traffic_per_second: 78_450 + 25_312_338 + 2_723_784 + 505_926 = 28_620_498 / (1024 * 1024) ≈ 27.29 MiB/s`
-- `IOPS: 25 + 868 + 1736 + 17_361 + 347 = 20_637`
+- `Capacity: Capacity: (80_200 + 76_384) B/s * 86_400 * 365 = 4_938_033_024_000 B / (1024^4) ≈ 4.491 TiB`
+- `Traffic_per_second: 80_200 + 42_117_786 + 2_784_544 + 841_822 = 45_824_352 B/s / (1024 * 1024) ≈ 43.70 MiB/s`
+- `IOPS: 25 + 868 + 1736 + 17_361 + 347 = 20_337`
 - 
-- `Disks_for_capacity =4.043 TiB / 10 TiB ≈ 0.4`
-- `Disks_for_throughput = 27.29 MiB/s / (3 * 1024) MiB/s = 0.008`
-- `Disks_for_iops = 19_990 / 10000 = 1.9`
+- `Disks_for_capacity = 4.491 TiB / 10 TiB ≈ 0.449`
+- `Disks_for_throughput = 43.70 MiB/s / (3 * 1024) MiB/s ≈ 0.014`
+- `Disks_for_iops = 20_337 / 10000 ≈ 2.03`
 - 
-- `Disks = max(ceil(0.4), ceil(0.008), ceil(1.9)) = 2`
+- `isks = max(ceil(0.449), ceil(0.014), ceil(2.03)) = 3`
 
-### Медиа в постах, ленте, поиске (SSD SATA)
-- `Capacity: 625_000_000 B/s * 86_400 * 365 ≈ 17 928.22 TiB`
+### Медиа в постах, ленте, поиске на первые 2 месяца (SSD SATA)
+- `Capacity: 625_000_000 B/s * 86_400 * 60 = 3_240_000_000_000_000 B ≈ 2_946.76 TiB`
 - `Traffic_per_second = 625_000_000 + 21_700_000_000 + 173_500_000 + 43_402_500_000 = 65_901_000_000 B/s ≈ 62_848.09 MiB/s`
 - `IOPS: 125 + 4340 + 347 + 86_805 = 91_617`
 - 
-- `Disks_for_capacity = 17 928.22 TiB / 100 TiB ≈ 179.3`
+- `Disks_for_capacity = 2_946.76 TiB / 100 TiB ≈ 29.5`
 - `Disks_for_throughput = 62_848.09 MiB/s / 500 MiB/s ≈ 125.7`
 - `Disks_for_iops = 91_617 / 1000 = 91.6`
 - 
-- `Disks = max(ceil(179.3), ceil(125.7), ceil(91.6)) = 180`
+- `Disks = max(ceil(29.5), ceil(125.7), ceil(91.6)) = 126`
+
+### Медиа в постах, ленте, поиске на 10 месяцев при нагрузке на чтение в 10% от исходной (HDD)
+- `Capacity: 625_000_000 B/s * 86_400 * 300 = 16_200_000_000_000_000 B ≈ 14_733.81 TiB`
+- `Traffic_per_second = 625_000_000 + (21_700_000_000 + 173_500_000 + 43_402_500_000) * 0.1 = 7_152_600_000 B/s ≈ 6_821.25 MiB/s`
+- `IOPS: 125 + (4340 + 347 + 86_805) * 0.1 = 9_274.2`
+- 
+- `Disks_for_capacity = 16_200 TB / 32 TB = 506.25`
+- `Disks_for_throughput = 6_821.25 MiB/s / 100 MiB/s ≈ 68.2`
+- `Disks_for_iops = 9_274.2 / 100 = 92.7`
+- 
+- `Disks = max(ceil(506.25), ceil(68.2), ceil(92.7)) = 507`
 
 ### Комментарии (SSD nvme)
 - `Capacity: 721_760 B/s * 86_400 * 365 ≈ 20.7 TiB`
 - `Traffic_per_second = 721_760 + 3_610_880 ≈ 4.13 MiB/s`
-- `IOPS: 347 + 1736 + = 2083`
+- `IOPS: 347 + 1736 = 2083`
 - 
 - `Disks_for_capacity = 20.7 TiB / 25 TiB ≈ 0.8`
 - `Disks_for_throughput = 4.13 MiB/s / 10000 MiB/s ≈ 0.0004`
-- `Disks_for_iops = 2083 / (3 * 1024)  = 0.67`
+- `Disks_for_iops = 2083 / 10000  = 0.2`
 - 
-- `Disks = max(ceil(0.8), ceil(0.04), ceil(0.67)) = 1`
+- `Disks = max(ceil(0.8), ceil(0.04), ceil(0.2)) = 1`
 
 
 ## Модель хранения данных
